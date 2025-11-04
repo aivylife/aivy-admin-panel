@@ -139,6 +139,7 @@
                     color="primary"
                   />
                 </div>
+
                 <div class="col-12 col-md-6">
                   <q-toggle
                     v-model="formData.isMarathon"
@@ -146,6 +147,16 @@
                     color="primary"
                   />
                 </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="col-12 col-md-6">
+                <q-toggle
+                  v-model="formData.isSubscriptionOnly"
+                  label="Только по подписке"
+                  color="primary"
+                />
               </div>
             </div>
           </div>
@@ -865,6 +876,7 @@ export default defineComponent({
       isShared: false,
       isMarathon: false,
       icon: null,
+      isSubscriptionOnly: false,
       content: {
         data: {
           description: [],
@@ -1125,6 +1137,7 @@ export default defineComponent({
           isEdit.value = true
           const response = await api.get(`/exercise/${id}`)
           const exercise = response.data
+
           formData.value = {
             id: exercise.id,
             title: exercise.title,
@@ -1140,6 +1153,7 @@ export default defineComponent({
             isShared: exercise.isShared || false,
             isMarathon: exercise.isMarathon || false,
             icon: exercise.icon,
+            isSubscriptionOnly: exercise.isSubscriptionOnly,
             // Сохраняем полную информацию о формате
             selectedFormat: exercise.format,
             content: {

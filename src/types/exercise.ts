@@ -71,4 +71,7 @@ export interface Exercise {
   icon: { id: number; name: string; path: string } | null
   content: ExerciseContent
   order: number
+  isSubscriptionOnly: boolean
+  isShared: boolean
+  isMarathon: boolean
 }
