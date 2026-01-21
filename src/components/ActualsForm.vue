@@ -57,19 +57,59 @@
                   bg-color="white"
                 />
 
-                <q-input
-                  label="Текст кнопки"
-                  v-model="story.description"
-                  outlined
-                  bg-color="white"
-                />
+                <div class="links-section">
+                  <h6 class="text-h6">Ссылки</h6>
 
-                <q-input
-                  label="Ссылка"
-                  v-model="story.link"
-                  outlined
-                  bg-color="white"
-                />
+                  <div
+                    v-for="(link, linkIndex) in story.links"
+                    :key="linkIndex"
+                    class="link-row"
+                  >
+                    <q-input
+                      label="Текст"
+                      v-model="link.label"
+                      outlined
+                      dense
+                      bg-color="white"
+                      class="link-input"
+                      :rules="[
+                        (val) => Boolean(val?.trim()) || 'Обязательное поле',
+                      ]"
+                    />
+
+                    <q-input
+                      label="Ссылка"
+                      v-model="link.url"
+                      outlined
+                      dense
+                      bg-color="white"
+                      class="link-input"
+                      :rules="[
+                        (val) => Boolean(val?.trim()) || 'Обязательное поле',
+                      ]"
+                    />
+
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      icon="close"
+                      color="negative"
+                      @click="onRemoveLink(index, linkIndex)"
+                      v-if="story.links && story.links.length > 1"
+                    />
+                  </div>
+                  <q-btn
+                    flat
+                    dense
+                    label="Добавить ссылку"
+                    icon="add"
+                    color="primary"
+                    size="sm"
+                    class="q-mt-sm"
+                    @click="onAddLink(index)"
+                  />
+                </div>
 
                 <q-btn
                   flat
@@ -169,7 +209,7 @@ export default defineComponent({
       stories: [
         {
           order: 1,
-          link: '',
+          links: [{ url: '', label: '' }],
           file: null,
         },
       ],
@@ -179,9 +219,34 @@ export default defineComponent({
     const onAddStory = () => {
       formData.value.stories.push({
         order: formData.value.stories.length + 1,
-        link: '',
+        links: [{ url: '', label: '' }],
         file: null,
       })
+    }
+
+    const onAddLink = (storyIndex: number) => {
+      const story = formData.value.stories[storyIndex]
+
+      if (!story.links) {
+        story.links = []
+      }
+
+      story.links.push({ url: '', label: '' })
+    }
+
+    const onRemoveLink = (storyIndex: number, linkIndex: number) => {
+      const story = formData.value.stories[storyIndex]
+
+      if (story.links && story.links.length > 1) {
+        story.links.splice(linkIndex, 1)
+      }
+    }
+
+    const trimLinks = (links: { url: string; label: string }[] | undefined) => {
+      return (links || []).map((link) => ({
+        url: link.url.trim(),
+        label: link.label.trim(),
+      }))
     }
 
     const onDeleteStory = async (id?: number, index?: number) => {
@@ -200,7 +265,7 @@ export default defineComponent({
           await api.delete(`/story/${id}`)
 
           formData.value.stories = formData.value.stories.filter(
-            (story) => story.id !== id
+            (story) => story.id !== id,
           )
 
           $q?.notify({
@@ -268,7 +333,7 @@ export default defineComponent({
           name: actualStory.name,
           stories:
             actualStory.stories.sort(
-              (a, b) => (a.order || 0) - (b.order || 0)
+              (a, b) => (a.order || 0) - (b.order || 0),
             ) || [],
           preview: actualStory.preview || null,
         }
@@ -293,7 +358,10 @@ export default defineComponent({
         if (isEdit.value) {
           for await (const story of stories || []) {
             if (story.id) {
-              await api.patch(`/story/${story.id}`, story)
+              await api.patch(`/story/${story.id}`, {
+                ...story,
+                links: trimLinks(story.links),
+              })
             } else {
               const data: Partial<Story> = {
                 title: '',
@@ -303,7 +371,7 @@ export default defineComponent({
                 isReleased: true,
                 isBanner: false,
                 order: story.order,
-                link: story.link,
+                links: trimLinks(story.links),
                 fileId: story.file?.id || null,
                 previewId: preview?.id || null,
               }
@@ -335,7 +403,7 @@ export default defineComponent({
               isReleased: true,
               isBanner: false,
               order: story.order,
-              link: story.link,
+              links: trimLinks(story.links),
               fileId: story.file?.id || null,
               previewId: preview?.id || null,
             }
@@ -377,6 +445,8 @@ export default defineComponent({
       onSubmit,
       onAddStory,
       onDeleteStory,
+      onAddLink,
+      onRemoveLink,
     }
   },
 })
@@ -397,6 +467,22 @@ export default defineComponent({
   flex-direction: column;
   gap: 16px;
   flex-grow: 1;
+}
+
+.links-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.link-input {
+  flex: 1;
 }
 
 .exercise-form-card {
@@ -510,8 +596,11 @@ export default defineComponent({
       $aivy-turquoise-5 0%,
       $aivy-indigo-3 100%
     );
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;

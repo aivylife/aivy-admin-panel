@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "dev": "ENV_FILE=development quasar dev",
+    "prod": "ENV_FILE=production quasar dev",
     "build:development": "ENV_FILE=development quasar build",
     "build:production": "ENV_FILE=production quasar build"
   },

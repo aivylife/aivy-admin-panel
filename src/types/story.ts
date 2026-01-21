@@ -10,6 +10,11 @@ export type Actuals = {
   preview: File | null
 }
 
+export type StoryLink = {
+  url: string
+  label: string
+}
+
 export type Story = {
   id: number
   createdAt: string
@@ -24,7 +29,7 @@ export type Story = {
   isReleased: boolean
   isBanner: boolean
   previewId: number | null
-  link: string | null
+  links: StoryLink[]
   file: File | null
   preview: File | null
 }
