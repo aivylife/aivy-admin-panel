@@ -17,12 +17,54 @@
     <q-card class="exercise-form-card q-pa-md">
       <q-card-section>
         <q-form @submit="onSubmit" class="q-gutter-md">
-          <div class="story-rows">
-            <q-input
-              label="Ссылка"
-              v-model="formData.link"
-              outlined
-              bg-color="white"
+          <div class="links-section">
+            <h6 class="text-h6">Ссылки</h6>
+
+            <div
+              v-for="(link, linkIndex) in formData.links"
+              :key="linkIndex"
+              class="link-row"
+            >
+              <q-input
+                label="Текст"
+                v-model="link.label"
+                outlined
+                dense
+                bg-color="white"
+                class="link-input"
+                :rules="[
+                  (val) => Boolean(val?.trim()) || 'Обязательное поле',
+                ]"
+              />
+
+              <q-input
+                label="Ссылка"
+                v-model="link.url"
+                outlined
+                dense
+                bg-color="white"
+                class="link-input"
+                :rules="[
+                  (val) => Boolean(val?.trim()) || 'Обязательное поле',
+                ]"
+              />
+
+              <q-btn
+                flat
+                round
+                dense
+                icon="close"
+                color="negative"
+                @click="onRemoveLink(linkIndex)"
+              />
+            </div>
+            <q-btn
+              flat
+              label="Добавить ссылку"
+              icon="add"
+              color="primary"
+              class="q-mt-sm add-link-btn"
+              @click="onAddLink"
             />
           </div>
 
@@ -95,8 +137,28 @@ export default defineComponent({
 
     const formData = ref<Partial<RealStory>>({
       file: null,
-      link: null,
+      links: [],
     })
+
+    const onAddLink = () => {
+      if (!formData.value.links) {
+        formData.value.links = []
+      }
+      formData.value.links.push({ url: '', label: '' })
+    }
+
+    const onRemoveLink = (linkIndex: number) => {
+      if (formData.value.links) {
+        formData.value.links.splice(linkIndex, 1)
+      }
+    }
+
+    const trimLinks = (links: { url: string; label: string }[] | undefined) => {
+      return (links || []).map((link) => ({
+        url: link.url.trim(),
+        label: link.label.trim(),
+      }))
+    }
 
     onMounted(async () => {
       const id = route.params.id
@@ -111,7 +173,7 @@ export default defineComponent({
         const story = response.data
 
         formData.value = {
-          link: story.link,
+          links: story.links || [],
           file: story.file,
         }
       } catch (error) {
@@ -130,7 +192,7 @@ export default defineComponent({
       loading.value = true
 
       const data: Partial<RealStory> = {
-        link: formData.value.link,
+        links: trimLinks(formData.value.links),
         file: formData.value.file,
       }
 
@@ -170,6 +232,8 @@ export default defineComponent({
       loading,
       isEdit,
       onSubmit,
+      onAddLink,
+      onRemoveLink,
     }
   },
 })
@@ -190,6 +254,31 @@ export default defineComponent({
   flex-direction: column;
   gap: 16px;
   flex-grow: 1;
+}
+
+.links-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.link-input {
+  flex: 1;
+}
+
+.link-row .q-btn {
+  margin-top: 0;
+}
+
+.add-link-btn {
+  padding: 8px 16px;
+  font-size: 14px;
 }
 
 .exercise-form-card {

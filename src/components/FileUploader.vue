@@ -131,7 +131,7 @@
 import { defineComponent, ref, watch, computed, PropType } from 'vue'
 import { useQuasar } from 'quasar'
 import { ValidationRule } from 'quasar'
-import { BASE_URL } from 'src/boot/axios'
+import { API_URL, BASE_URL } from 'src/boot/axios'
 
 export default defineComponent({
   name: 'FileUploader',
@@ -190,7 +190,7 @@ export default defineComponent({
       }
 
       return /\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|webp)$/i.test(
-        props.modelValue?.path || ''
+        props.modelValue?.path || '',
       )
     })
 
@@ -200,7 +200,7 @@ export default defineComponent({
       }
 
       return /\.(mp4|MP4|webm|WEBM|ogg|OGG)$/i.test(
-        props.modelValue?.path || ''
+        props.modelValue?.path || '',
       )
     })
 
@@ -236,7 +236,7 @@ export default defineComponent({
     }
 
     const getFileUrl = async (
-      file: File | { id?: number; path?: string } | string | null
+      file: File | { id?: number; path?: string } | string | null,
     ): Promise<string> => {
       try {
         if (!file) return ''
@@ -304,11 +304,11 @@ export default defineComponent({
 
         xhr.open(
           'POST',
-          `${BASE_URL}/api-file/file/upload/${getFileType(fileToUpload)}`
+          `${API_URL}/api-file/file/upload/${getFileType(fileToUpload)}`,
         )
         xhr.setRequestHeader(
           'Authorization',
-          `Bearer ${localStorage.getItem('accessToken')}`
+          `Bearer ${localStorage.getItem('accessToken')}`,
         )
         xhr.send(formData)
       })
@@ -398,7 +398,7 @@ export default defineComponent({
           // Для видео и аудио не загружаем автоматически
         }
       },
-      { immediate: true }
+      { immediate: true },
     )
 
     // Следим за изменениями modelValue
@@ -423,7 +423,7 @@ export default defineComponent({
           isAudioLoaded.value = false
         }
       },
-      { immediate: true }
+      { immediate: true },
     )
 
     return {

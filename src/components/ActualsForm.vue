@@ -96,17 +96,14 @@
                       icon="close"
                       color="negative"
                       @click="onRemoveLink(index, linkIndex)"
-                      v-if="story.links && story.links.length > 1"
                     />
                   </div>
                   <q-btn
                     flat
-                    dense
                     label="Добавить ссылку"
                     icon="add"
                     color="primary"
-                    size="sm"
-                    class="q-mt-sm"
+                    class="q-mt-sm add-link-btn"
                     @click="onAddLink(index)"
                   />
                 </div>
@@ -237,7 +234,7 @@ export default defineComponent({
     const onRemoveLink = (storyIndex: number, linkIndex: number) => {
       const story = formData.value.stories[storyIndex]
 
-      if (story.links && story.links.length > 1) {
+      if (story.links) {
         story.links.splice(linkIndex, 1)
       }
     }
@@ -478,11 +475,20 @@ export default defineComponent({
 .link-row {
   display: flex;
   gap: 8px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .link-input {
   flex: 1;
+}
+
+.link-row .q-btn {
+  margin-top: 0;
+}
+
+.add-link-btn {
+  padding: 8px 16px;
+  font-size: 14px;
 }
 
 .exercise-form-card {

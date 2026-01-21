@@ -39,7 +39,7 @@ export type RealStory = {
   createdAt: string
   updatedAt: string
   deletedAt: string | null
-  link: string | null
+  links: StoryLink[]
   fileId: number | null
   file: File | null
 }
